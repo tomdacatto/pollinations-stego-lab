@@ -103,7 +103,11 @@ export async function chat(model, messages, { signal } = {}) {
         body: JSON.stringify({ model, messages }),
         signal,
     });
-    if (res.ok) return (await res.json()).choices?.[0]?.message?.content ?? "";
+    if (res.ok) {
+        const choice = (await res.json()).choices?.[0];
+        if (choice?.finish_reason === "refusal") throw new PollenError(`${model} refused.`, 200);
+        return choice?.message?.content ?? "";
+    }
     const detail = (await res.json().catch(() => ({}))).error?.message ?? `Request failed (${res.status})`;
     if (res.status === 401) {
         clearSession();

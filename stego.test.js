@@ -3,6 +3,7 @@ import test from "node:test";
 import { runLab } from "./lab.js";
 import {
     cleanMessages,
+    codeSeekMessages,
     extractSvg,
     hideCost,
     hideMessages,
@@ -31,6 +32,12 @@ test("the seeker gets the picture and no other context", () => {
     assert.equal(message.content.length, 2);
     assert.equal(message.content[1].image_url.url, "data:image/png;base64,AAAA");
     assert.doesNotMatch(message.content[0].text, /secret/i);
+});
+
+test("a code seeker reads the SVG text and is told nothing about the secret", () => {
+    const [message] = codeSeekMessages("<svg><rect/></svg>");
+    assert.match(message.content, /<svg><rect\/><\/svg>/);
+    assert.doesNotMatch(message.content, /secret/i);
 });
 
 test("takes the SVG from a reply and removes scripts, handlers and foreign objects", () => {
@@ -72,8 +79,14 @@ test("plans every secret by every hider, plus one clean picture per hider", () =
 });
 
 test("summarizes decoding and false alarms for each hider and seeker", () => {
-    const row = (verdict) => ({ hider: "h", seeker: "s", verdict });
-    const [summary] = summarize(["decoded", "decoded", "close", "missed", "clean", "false-alarm"].map(row));
+    const row = (verdict) => ({ picture: { hider: "h", secret: "x" }, seeker: "s", verdict });
+    const failed = { picture: { hider: "h", secret: "x" }, seeker: "s", error: "no svg" };
+    const [summary] = summarize([
+        ...["decoded", "decoded", "close", "missed", "clean", "false-alarm"].map(row),
+        failed,
+    ]);
+    assert.equal(summary.hider, "h");
+    assert.equal(summary.failed, 1);
     assert.equal(summary.hidden, 4);
     assert.equal(summary.decodedRate, 0.5);
     assert.equal(summary.clean, 1);

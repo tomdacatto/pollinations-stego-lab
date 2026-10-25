@@ -5,6 +5,7 @@ import { chat, clearSession, completeSignIn, getSession, startSignIn } from "./p
 import { rasterize } from "./raster.js";
 import {
     cleanMessages,
+    codeSeekMessages,
     extractSvg,
     hideMessages,
     labCost,
@@ -81,7 +82,9 @@ const secrets = () =>
 
 function plan() {
     const hiders = checked("#hiders");
-    const seekers = checked("#seekers");
+    // A seeker is a model and what it is shown: the picture, and optionally the SVG code too.
+    const modes = $("#code").checked ? ["picture", "code"] : ["picture"];
+    const seekers = checked("#seekers").flatMap((name) => modes.map((mode) => `${name} · ${mode}`));
     const list = pictures({ hiders, secrets: secrets(), control: $("#control").checked });
     return { hiders, seekers, list };
 }
@@ -96,7 +99,7 @@ function renderEstimate() {
     const cost = labCost({
         pictureList: list,
         hiderModels: Object.fromEntries(hiders.map((name) => [name, models[name]])),
-        seekerModels: seekers.map((name) => models[name]),
+        seekerModels: seekers.map((label) => models[label.split(" · ")[0]]),
     });
     $("#estimate").textContent =
         `${list.length} pictures, each looked at by ${seekers.length} seeker${seekers.length > 1 ? "s" : ""}: about ${money(cost)} Pollen (a rough estimate).`;
@@ -109,7 +112,7 @@ function renderSummary() {
     const table = $("#table");
     table.replaceChildren();
     const head = el("tr");
-    for (const title of ["Hider", "Seeker", "Decoded", "Close", "Wrong", "Missed", "False alarms"])
+    for (const title of ["Hider", "Seeker", "Decoded", "Close", "Wrong", "Missed", "False alarms", "Failed"])
         head.append(el("th", "", title));
     table.append(head);
     for (const row of rows) {
@@ -123,6 +126,7 @@ function renderSummary() {
             row.wrong,
             row.missed,
             row.clean + row.falseAlarm ? `${row.falseAlarm} of ${row.clean + row.falseAlarm}` : "no control",
+            row.failed,
         ];
         for (const cell of cells) tr.append(el("td", "", String(cell)));
         table.append(tr);
@@ -213,7 +217,11 @@ async function run() {
                     ),
                 ),
             rasterize,
-            seek: async (seeker, png) => readAnswer(await chat(seeker, seekMessages(png), { signal })),
+            seek: async (seeker, png, svg) => {
+                const [model, mode] = seeker.split(" · ");
+                const messages = mode === "code" ? codeSeekMessages(svg) : seekMessages(png);
+                return readAnswer(await chat(model, messages, { signal }));
+            },
             onPicture: ({ picture, svg, png }) => card(picture, svg, png),
             onResult: (result) => {
                 state.results.push(result);
@@ -247,6 +255,7 @@ $("#blind").onchange = () => {
     for (const picture of state.cards.keys()) paintCard(picture);
 };
 $("#control").onchange = renderEstimate;
+$("#code").onchange = renderEstimate;
 $("#secrets").oninput = renderEstimate;
 $("#secrets").value = DEFAULT_SECRETS.join("\n");
 

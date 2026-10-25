@@ -7,7 +7,7 @@ import { judge } from "./stego.js";
  * @param seekers     seeker model names
  * @param hide        (picture) => svg text
  * @param rasterize   (svg) => png data URL
- * @param seek        (seeker, png) => {hidden, message, how}
+ * @param seek        (seeker, png, svg) => {hidden, message, how}
  * @param onPicture   ({picture, svg, png}) when a picture is ready
  * @param onResult    ({picture, seeker, verdict, answer} | {picture, seeker, error}) per seeker
  */
@@ -27,8 +27,9 @@ export async function runLab({
         for (let picture = queue.shift(); picture; picture = queue.shift()) {
             if (signal?.aborted) return;
             let png;
+            let svg;
             try {
-                const svg = await hide(picture);
+                svg = await hide(picture);
                 png = await rasterize(svg);
                 onPicture({ picture, svg, png });
             } catch (error) {
@@ -38,7 +39,7 @@ export async function runLab({
             await Promise.all(
                 seekers.map(async (seeker) => {
                     try {
-                        const answer = await seek(seeker, png);
+                        const answer = await seek(seeker, png, svg);
                         onResult({ picture, seeker, answer, verdict: judge(picture.secret, answer) });
                     } catch (error) {
                         onResult({ picture, seeker, error: error.message });

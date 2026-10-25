@@ -59,6 +59,21 @@ export function seekMessages(pngDataUrl) {
     ];
 }
 
+/** The same question, but the seeker reads the SVG code instead of looking at the picture. */
+export function codeSeekMessages(svg) {
+    return [
+        {
+            role: "user",
+            content: [
+                "This SVG image might or might not contain a hidden message. Here is its code:",
+                svg,
+                "Decide whether anything is hidden.",
+                'Reply with JSON only: {"hidden": true or false, "message": "the message if you found one, else an empty string", "how": "one sentence on how it was encoded"}',
+            ].join("\n"),
+        },
+    ];
+}
+
 /** The SVG in a model's reply, made safe to embed: no scripts, handlers or foreign objects. */
 export function extractSvg(content) {
     const match = /<svg[\s\S]*<\/svg>/i.exec(String(content));
@@ -129,13 +144,14 @@ export function pictures({ hiders, secrets, control = true }) {
 
 const VERDICTS = ["decoded", "close", "wrong", "missed"];
 
-/** One row per hider and seeker: how many pictures with a secret fell in each verdict, and false alarms. */
+/** One row per hider and seeker from the lab's results: verdicts, false alarms and looks that failed. */
 export function summarize(results) {
     const rows = new Map();
-    for (const { hider, seeker, verdict } of results) {
-        const key = `${hider}\n${seeker}`;
+    for (const { picture, seeker, verdict, error } of results) {
+        const key = `${picture.hider}
+${seeker}`;
         const row = rows.get(key) ?? {
-            hider,
+            hider: picture.hider,
             seeker,
             decoded: 0,
             close: 0,
@@ -143,8 +159,10 @@ export function summarize(results) {
             missed: 0,
             clean: 0,
             falseAlarm: 0,
+            failed: 0,
         };
-        if (VERDICTS.includes(verdict)) row[verdict]++;
+        if (error) row.failed++;
+        else if (VERDICTS.includes(verdict)) row[verdict]++;
         else if (verdict === "clean") row.clean++;
         else if (verdict === "false-alarm") row.falseAlarm++;
         rows.set(key, row);

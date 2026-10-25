@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Stego Lab: can a model find what another model hid?</title>
+    <meta name="description" content="One model draws a picture with a secret hidden in it; a fresh model sees only the rendered picture and says whether anything is hidden. Run the experiment from the Fable 5.1 post on any Pollinations models, paid with your own Pollen.">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="top">
+        <a class="brand" href="./">Stego Lab</a>
+        <div class="session">
+            <span id="whoami" hidden>Signed in with your Pollen</span>
+            <button id="sign-in" class="button primary" type="button">Sign in with Pollen</button>
+            <button id="sign-out" class="button" type="button" hidden>Sign out</button>
+        </div>
+    </header>
+
+    <main>
+        <section class="intro">
+            <h1>Can a model find what another model hid?</h1>
+            <p>
+                A <strong>hider</strong> model draws a picture as SVG code with a secret hidden in it and no agreed scheme.
+                A fresh <strong>seeker</strong> model is shown only the rendered picture, never the code, and is asked whether anything is hidden.
+                Run it on any Pollinations models and see, per pair, how often the secret comes back and how often a seeker finds a message in a picture that has none.
+                This is the setup of <a href="https://www.lesswrong.com/posts/WHEQps5PK8LrrcTAb/how-does-fable-5-1-hide-messages-in-images">How does Fable 5.1 hide messages in images?</a>
+            </p>
+        </section>
+
+        <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+
+        <section class="card">
+            <h2>Set up a lab</h2>
+            <label class="field">Secrets, one per line
+                <textarea id="secrets" rows="3"></textarea>
+            </label>
+            <div class="pickers">
+                <fieldset>
+                    <legend>Hiders (draw the picture)</legend>
+                    <div id="hiders" class="models"></div>
+                </fieldset>
+                <fieldset>
+                    <legend>Seekers (see only the picture)</legend>
+                    <div id="seekers" class="models"></div>
+                </fieldset>
+            </div>
+            <label class="check"><input id="control" type="checkbox" checked> Also draw one picture with nothing hidden per hider, to count false alarms</label>
+            <label class="check"><input id="blind" type="checkbox"> Hide the secrets so I can guess before looking at the results</label>
+            <p id="estimate" class="fine"></p>
+            <div class="row">
+                <button id="run" class="button primary" type="button">Run the lab</button>
+                <button id="stop" class="button" type="button" hidden>Stop</button>
+                <span id="progress" class="fine"></span>
+            </div>
+        </section>
+
+        <section id="summary" class="card" hidden>
+            <h2>Results</h2>
+            <div class="scroll"><table id="table"></table></div>
+        </section>
+
+        <section id="gallery" class="gallery" aria-live="polite"></section>
+    </main>
+
+    <footer class="foot">
+        <p>
+            Every model call runs on <a href="https://pollinations.ai/?ref=badge">Pollinations</a>. This page has no server and keeps no key: you sign in with
+            <a href="https://github.com/pollinations/pollinations/blob/main/BRING_YOUR_OWN_POLLEN.md">your own Pollen</a> and the lab is paid from your balance.
+            Claude models need paid Pollen. Made with pollinations.ai.
+        </p>
+    </footer>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>

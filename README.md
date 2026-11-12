@@ -43,7 +43,7 @@ Signed in with my own Pollen on the live code, one lab: four hiders (`gemini-3.5
 
 ## How it pays
 
-There is no server and no key in this repository. The visitor signs in on enter.pollinations.ai ([Bring Your Own Pollen](https://github.com/pollinations/pollinations/blob/main/BRING_YOUR_OWN_POLLEN.md), fragment flow); the key comes back in the URL fragment, is removed from the address bar and is kept in `sessionStorage` for that tab only. The sign-in asks for a 0.5 Pollen budget and one day. Models and their prices come live from `gen.pollinations.ai/text/models`, and the page shows a rough price for the lab before it runs. Seekers are limited to models that accept images. Claude models are paid-only.
+There is no server and no key in this repository. The visitor signs in on enter.pollinations.ai ([Bring Your Own Pollen](https://github.com/pollinations/pollinations/blob/main/BRING_YOUR_OWN_POLLEN.md), fragment flow); the key comes back in the URL fragment, is removed from the address bar and is kept in `sessionStorage` for that tab only. The sign-in asks for a 0.5 Pollen budget and one day. Models and their prices come live from `gen.pollinations.ai/text/models`, and the page shows a rough price for the lab before it runs. Seekers are limited to models that accept images. Claude models are paid-only. The sign-in sends the app's publishable App Key (`pk_...`, redirect URI exactly this page's address, earnings off) as `client_id`, so the consent screen names the app.
 
 ## Safety of the pictures
 

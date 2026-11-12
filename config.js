@@ -12,3 +12,7 @@ export const DEFAULT_SEEKER = "openai/gpt-5.4-nano";
 
 // Secrets the lab starts with: short, so a seeker can recover them.
 export const DEFAULT_SECRETS = ["moon", "paper boat", "seven rivers"];
+
+// The app's publishable App Key (pk_...), sent as client_id so the consent screen names the app and usage is
+// attributed to it. Its redirect URI is exactly this page's address.
+export const APP_KEY = "pk_vEbEtbOXlIiQzPtr";

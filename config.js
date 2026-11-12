@@ -7,8 +7,8 @@ export const EXPIRY_DAYS = 1;
 export const CONCURRENCY = 3;
 
 // Models offered first, when the live list has them. Hiders can be any text model.
-export const DEFAULT_HIDER = "google/gemini-3.5-flash-lite";
-export const DEFAULT_SEEKER = "google/gemini-3.5-flash-lite";
+export const DEFAULT_HIDER = "openai/gpt-5.4-nano";
+export const DEFAULT_SEEKER = "openai/gpt-5.4-nano";
 
 // Secrets the lab starts with: short, so a seeker can recover them.
 export const DEFAULT_SECRETS = ["moon", "paper boat", "seven rivers"];

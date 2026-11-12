@@ -37,6 +37,7 @@ Signed in with my own Pollen on the live code, one lab: four hiders (`gemini-3.5
 
 ## Not verified
 
+- The default hider and seeker, `openai/gpt-5.4-nano`, are free (`paid_only` is false on `gen.pollinations.ai/v1/models`, checked 2026-11-12), so a visitor with only free Pollen can run the first lab. Paid models stay in the list, marked "paid"; picking one on free Pollen ends the run with the 402 message.
 - Fable 5.1, Opus and other expensive models were not run. Tool use for seekers is not part of the app.
 - Phones and browsers other than desktop Chrome. The sign-in redirect on the live address: the key was loaded into the page from a device-flow login for this run.
 
